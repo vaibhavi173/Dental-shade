@@ -1,0 +1,53 @@
+import cv2
+
+img = cv2.imread('OCV1.jpeg', 1)
+roi = cv2.selectROI(img)
+#print(roi)
+img_crop = img[int (roi[1]):int(roi[1]+roi[3]),int(roi[0]):int(roi[0]+roi[2])]
+
+cv2.imshow('cropped_image', img_crop)
+k = cv2.waitKey(0)
+cv2.imwrite('cropped_img_copy.png', img_crop)
+
+
+if k == 27:
+    cv2.destroyAllWindows()
+elif k == ord('s'):
+    #hsv = cv2.cvtColor(img_crop, cv2.COLOR_BGR2HSV)
+    #cbcr = cv2.cvtColor(img_crop, cv2.COLOR_BGR2YCR_CB)
+    lab = cv2.cvtColor(img_crop, cv2.COLOR_BGR2LAB)
+    
+    #print(hsv)
+    #print(cbcr)
+    print(lab)
+   
+
+import pandas as pd
+import numpy as np
+dataset = pd.read_csv("dataset - Sheet1.csv")
+x = dataset.iloc[:,:-1].values
+y = dataset.iloc[:,3].values
+#print(x)
+#print(y)
+
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.10,random_state = 2)
+
+from sklearn.preprocessing import StandardScaler
+scalar=StandardScaler()
+scalar.fit(x_train)
+x_train=scalar.transform(x_train)
+x=scalar.transform(x_test)
+print(x_train)
+print(x_test)
+
+from sklearn.neighbors import KNeighborsClassifier
+classifier= KNeighborsClassifier(n_neighbors=4)
+classifier.fit(x_train,y_train)
+y_pred=classifier.predict([[61.18411,-0.25212,6.5407]]) .#need to find out how to fit in multiple values
+print(y_pred)
+
+
+
+#from sklearn.metrics import confusion_matrix
+#print(confusion_matrix(y_test,y_pred))
